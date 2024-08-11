@@ -19,7 +19,7 @@ html, body {
 .movie_card {
   position: relative;
   width: 800px;
-  height: 350px;
+  height: 400px;
   margin: 100px auto;
   overflow: hidden;
   border-radius: 10px;
@@ -41,6 +41,7 @@ html, body {
   position: relative;
   padding: 25px;
   height: 40%;
+  
   
 }
 .movie_card .info_section .movie_header h1 {
@@ -73,7 +74,7 @@ html, body {
 }
 .movie_card .info_section .movie_desc {
   padding: 25px;
-  height: 50%;
+  height: 20%;
 }
 .movie_card .info_section .movie_desc .text {
   color: #cfd6e1;
@@ -111,6 +112,13 @@ html, body {
   background-size: cover;
   border-radius: 11px;
 }
+
+.movie_header h1 {
+  overflow-wrap: break-word; /* Allows the text to break and wrap within the container */
+  word-wrap: break-word; /* Same as overflow-wrap, for older browsers */
+  max-width: 100%; /* Ensures the text does not exceed the container width */
+}
+
 
 @media screen and (min-width: 768px) {
   .movie_header {

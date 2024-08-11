@@ -13,8 +13,15 @@ const config = {
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.render("index.ejs");
+app.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("https://api.themoviedb.org/3/movie/popular", config,)
+    const result = response.data;
+    res.render("index.ejs", {content: result});
+  }
+  catch(error) {
+    console.error('Fetch error:', error);
+  }
 })
 
 app.get("/page1", async (req, res) => {
@@ -22,6 +29,7 @@ app.get("/page1", async (req, res) => {
     const response = await axios.get("https://api.themoviedb.org/3/movie/popular", config,)
     const result = response.data;
     console.log(result);
+    res.json(result);
   }
   catch(error) {
     console.error('Fetch error:', error);
