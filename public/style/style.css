@@ -4,6 +4,10 @@
   margin: 0;
 }
 
+.container {
+  
+}
+
 html, body {
   margin: 0;
   background: black;
@@ -14,7 +18,6 @@ html, body {
 
 .movie_card {
   position: relative;
-  display: block;
   width: 800px;
   height: 350px;
   margin: 100px auto;
@@ -30,7 +33,7 @@ html, body {
   position: relative;
   width: 100%;
   height: 100%;
-  background-blend-mode: multiply;
+  backgro700-blend-mode: multiply;
   z-index: 2;
   border-radius: 10px;
 }
@@ -38,6 +41,7 @@ html, body {
   position: relative;
   padding: 25px;
   height: 40%;
+  
 }
 .movie_card .info_section .movie_header h1 {
   color: #fff;
@@ -153,9 +157,9 @@ html, body {
   box-shadow: 0px 0px 120px -55px rgba(255, 51, 0, 0.5);
 }
 
-.bright_back {
+/* .bright_back {
   background: url("https://occ-0-2433-448.1.nflxso.net/art/cd5c9/3e192edf2027c536e25bb5d3b6ac93ced77cd5c9.jpg");
-}
+} */
 
 #tomb {
   box-shadow: 0px 0px 150px -45px rgba(19, 160, 134, 0.6);
@@ -164,9 +168,9 @@ html, body {
   box-shadow: 0px 0px 120px -55px rgba(19, 160, 134, 0.6);
 }
 
-.tomb_back {
+/* .tomb_back {
   background: url("https://fsmedia.imgix.net/cd/c9/5e/ba/4817/4d9a/93f0/c776ec32ecbc/lara-crofts-neck-looks-unnatural-in-the-new-poster-for-tomb-raider.png");
-}
+} */
 
 #ave {
   box-shadow: 0px 0px 150px -45px rgba(199, 147, 75, 0.7);
@@ -176,8 +180,8 @@ html, body {
   box-shadow: 0px 0px 120px -55px rgba(199, 147, 75, 0.7);
 }
 
-.ave_back {
+/* .ave_back {
   background: url("https://www.gannett-cdn.com/-mm-/c03fd140debe8ad4c05cf81a5cad7ad61a12ce52/c=0-1580-2985-3266&r=x803&c=1600x800/local/-/media/2017/06/09/USATODAY/USATODAY/636326272873599176-Black-Panther-Teaser.jpg");
-}
+} */
 
 /*# sourceMappingURL=style.css.map */
