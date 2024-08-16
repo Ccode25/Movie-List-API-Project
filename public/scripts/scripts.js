@@ -1,68 +1,77 @@
 let currentPage = 1;
-let records_per_page = 3;
-
-let objJson = [
-  { adName: "AdName 1"},
-  { adName: "AdName 2"},
-  { adName: "AdName 3"},
-  { adName: "AdName 4"},
-  { adName: "AdName 5"},
-  { adName: "AdName 6"},
-  { adName: "AdName 7"},
-  { adName: "AdName 8"},
-  { adName: "AdName 9"},
-  { adName: "AdName 10"}
-];
-
-function prevPage() { 
-  if currentPage > 1 {
-    currentPage--;
-    changePage(currentPage)
-  }
-}
 
 function nextPage() {
-  if (currentPage < numPages()) {
-    currentPage++
+  currentPage++;
+  updateURLAndFetch(currentPage);
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    updateURLAndFetch(currentPage);
   }
 }
 
-function changePage() {
-  let btn_next = document.getElementById("Next");
+function movieContent(movie) {
+  return `
+    <div class="movie_card" id="bright">
+      <div class="info_section">
+        <div class="movie_header">
+          <img class="locandina" src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" alt="${movie.original_title}" />
+          <h1>${movie.original_title}</h1>
+          <h4 class="text-lead fs-4 mb-3">${movie.release_date}</h4>
+        </div>
+        <div class="movie_desc">
+          <p class="text pb-4">${movie.overview}</p>
+        </div>
+      </div>
+      <div class="blur_back bright_back" style="background-image: url('https://image.tmdb.org/t/p/w500/${movie.backdrop_path}');"></div>
+    </div>
+  `;
+}
 
-  let btn_prev = document.getElementById("Previous");
+function updateURLAndFetch(page) {
+  // Update the browser's URL without reloading the page
+  const newUrl = `/movies?page=${page}`;
+  window.history.pushState({ page }, `Page ${page}`, newUrl);
 
-  let content = document.getElementById("content");
+  // Fetch the new page's data
+  renderMovies(page);
+}
 
-  let page_span = document.getElementById("span");
+async function movieData(page) {
+  const yourBearerToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhY2VkMjBlMDU3ZjY3YzA0Njc4ODQyMWJhZTA3NjI1NiIsIm5iZiI6MTcyMjg3MzQ1Mi4yNTQzNjMsInN1YiI6IjY2YjBmNGJmNTUwNDZjZjIzOWViNzc4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0omKPI04MmliYldMTJUoYWreUqHUj9DlinE5-HDU6TE';
+  const config = { 
+    headers: {
+      Authorization: `Bearer ${yourBearerToken}`
+    } 
+  };
 
-  if (page < 1) page = 1;
-  if (page > numPages()) page = numPages
-
-  listing_table.innerHTML = "";
-
-  for (var i = (page-1) * records_per_page; i < (page * records_per_page); i++) {
-      listing_table.innerHTML += objJson[i].adName + "<br>";
-  }
-  page_span.innerHTML = page;
-
-  if (page == 1) {
-      btn_prev.style.visibility = "hidden";
-  } else {
-      btn_prev.style.visibility = "visible";
-  }
-
-  if (page == numPages()) {
-      btn_next.style.visibility = "hidden";
-  } else {
-      btn_next.style.visibility = "visible";
+  try {
+    const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?page=${page}`, config);
+    return response.data; // Return data for further use
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return { results: [] }; // Return an empty array in case of error
   }
 }
 
-function numPages() {
-  return Math.ceil(objJson.length / records_per_page;);
+async function renderMovies(page) {
+  const data = await movieData(page);
+  const movies = data.results || []; // Ensure results is an array
+
+  $('#movie-container').empty(); // Clear existing content
+
+  movies.forEach(movie => {
+    const content = movieContent(movie);
+    $('#movie-container').append(content);
+  });
 }
 
-window.onload = function() {
-  changePage(1)
-}
+// Handle the browser's back/forward navigation
+window.addEventListener('popstate', (event) => {
+  if (event.state && event.state.page) {
+    currentPage = event.state.page;
+    updateURLAndFetch(currentPage);
+  }
+});
