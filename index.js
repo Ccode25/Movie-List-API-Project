@@ -20,7 +20,7 @@ app.set("view engine", "ejs");
 
 
 // API route to fetch movies based on page number
-app.get(`/movies`, async (req, res) => {
+app.get(`/`, async (req, res) => {
   const page = req.query.page || 1;
   
   try {
