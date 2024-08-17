@@ -2,6 +2,7 @@ let currentPage = 1;
 
 function nextPage() {
   currentPage++;
+  console.log(currentPage);
   updateURLAndFetch(currentPage);
 }
 
@@ -12,6 +13,22 @@ function prevPage() {
   }
 }
 
+
+ 
+
+    // Handle keypress event on document
+    $(document).on('keypress', function(e) {
+      if (e.which === 13) { 
+        e.preventDefault(); 
+        const inputQuery = $('#search-input').val().trim();
+        console.log(inputQuery); 
+        if(inputQuery) {
+          renderSearchMovies(inputQuery)
+        }
+        
+      }
+    });
+  // });
 function movieContent(movie) {
   return `
     <div class="movie_card" id="bright">
@@ -39,6 +56,15 @@ function updateURLAndFetch(page) {
   renderMovies(page);
 }
 
+function updateSearchURLAndFetch(query) {
+  // Update the browser's URL without reloading the page
+  const newUrl = `/movies?query=${query}`; 
+  window.history.pushState({ query }, `Query ${query}`, newUrl);
+
+  // Fetch the search results
+  renderSearchMovies(query);
+}
+
 async function movieData(page) {
   const yourBearerToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhY2VkMjBlMDU3ZjY3YzA0Njc4ODQyMWJhZTA3NjI1NiIsIm5iZiI6MTcyMjg3MzQ1Mi4yNTQzNjMsInN1YiI6IjY2YjBmNGJmNTUwNDZjZjIzOWViNzc4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0omKPI04MmliYldMTJUoYWreUqHUj9DlinE5-HDU6TE';
   const config = { 
@@ -49,6 +75,23 @@ async function movieData(page) {
 
   try {
     const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?page=${page}`, config);
+    return response.data; // Return data for further use
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return { results: [] }; // Return an empty array in case of error
+  }
+}
+
+async function searchData(query) {
+  const yourBearerToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhY2VkMjBlMDU3ZjY3YzA0Njc4ODQyMWJhZTA3NjI1NiIsIm5iZiI6MTcyMjg3MzQ1Mi4yNTQzNjMsInN1YiI6IjY2YjBmNGJmNTUwNDZjZjIzOWViNzc4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0omKPI04MmliYldMTJUoYWreUqHUj9DlinE5-HDU6TE';
+  const config = { 
+    headers: {
+      Authorization: `Bearer ${yourBearerToken}`
+    } 
+  };
+
+  try {
+    const response = await axios.get(`https://api.themoviedb.org/3/search/movie?query=${query}`, config);
     return response.data; // Return data for further use
   } catch (error) {
     console.error('Fetch error:', error);
@@ -68,10 +111,31 @@ async function renderMovies(page) {
   });
 }
 
+async function renderSearchMovies(inputQuery) {
+  const data = await searchData(inputQuery);
+  const movies = data.results || []; // Ensure results is an array
+
+  $('#movie-container').empty(); // Clear existing content
+
+  movies.forEach(movie => {
+    const content = movieContent(movie);
+    $('#movie-container').append(content);
+  });
+}
+
+function searchFunction() {
+  const query = document.getElementById("search-input").value.trim();
+  console.log(query);
+}
+
 // Handle the browser's back/forward navigation
 window.addEventListener('popstate', (event) => {
-  if (event.state && event.state.page) {
-    currentPage = event.state.page;
-    updateURLAndFetch(currentPage);
+  if (event.state) {
+    if (event.state.page) {
+      currentPage = event.state.page;
+      updateURLAndFetch(currentPage);
+    } else if (event.state.query) {
+      updateSearchURLAndFetch(event.state.query);
+    }
   }
 });
