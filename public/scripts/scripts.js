@@ -1,4 +1,13 @@
 let currentPage = 1;
+const yourBearerToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhY2VkMjBlMDU3ZjY3YzA0Njc4ODQyMWJhZTA3NjI1NiIsIm5iZiI6MTcyMjg3MzQ1Mi4yNTQzNjMsInN1YiI6IjY2YjBmNGJmNTUwNDZjZjIzOWViNzc4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0omKPI04MmliYldMTJUoYWreUqHUj9DlinE5-HDU6TE';
+const BASE_URL = 'https://api.themoviedb.org/3'
+const config = { 
+    headers: {
+      Authorization: `Bearer ${yourBearerToken}`
+    } 
+  };
+
+
 
 function nextPage() {
   currentPage++;
@@ -17,11 +26,11 @@ function prevPage() {
  
 
     // Handle keypress event on document
-    $(document).on('keypress', function(e) {
-      if (e.which === 13) { 
-        e.preventDefault(); 
+    $(document).on('keypress', (event) => { 
+      if (event.which === 13) { 
+        event.preventDefault(); 
         const inputQuery = $('#search-input').val().trim();
-        console.log(inputQuery); 
+        console.log(inputQuery);
         if(inputQuery) {
           renderSearchMovies(inputQuery)
         }
@@ -47,13 +56,25 @@ function movieContent(movie) {
   `;
 }
 
+function displayMovies(movies) {
+  // Clear existing content
+  $('#movie-container').empty();
+
+  // Loop through the movies array and append each movie's content
+  movies.forEach(movie => {
+    const content = movieContent(movie);
+    $('#movie-container').append(content);
+  });
+}
+
+
 function updateURLAndFetch(page) {
   // Update the browser's URL without reloading the page
   const newUrl = `/movies?page=${page}`;
   window.history.pushState({ page }, `Page ${page}`, newUrl);
 
   // Fetch the new page's data
-  renderMovies(page);
+  renderMovies(currentPage);
 }
 
 function updateSearchURLAndFetch(query) {
@@ -62,19 +83,13 @@ function updateSearchURLAndFetch(query) {
   window.history.pushState({ query }, `Query ${query}`, newUrl);
 
   // Fetch the search results
-  renderSearchMovies(query);
+  renderSearchMovies(inputQuery);
 }
 
 async function movieData(page) {
-  const yourBearerToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhY2VkMjBlMDU3ZjY3YzA0Njc4ODQyMWJhZTA3NjI1NiIsIm5iZiI6MTcyMjg3MzQ1Mi4yNTQzNjMsInN1YiI6IjY2YjBmNGJmNTUwNDZjZjIzOWViNzc4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0omKPI04MmliYldMTJUoYWreUqHUj9DlinE5-HDU6TE';
-  const config = { 
-    headers: {
-      Authorization: `Bearer ${yourBearerToken}`
-    } 
-  };
 
   try {
-    const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?page=${page}`, config);
+    const response = await axios.get(`${BASE_URL}/movie/popular?page=${page}`, config);
     return response.data; // Return data for further use
   } catch (error) {
     console.error('Fetch error:', error);
@@ -83,15 +98,10 @@ async function movieData(page) {
 }
 
 async function searchData(query) {
-  const yourBearerToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhY2VkMjBlMDU3ZjY3YzA0Njc4ODQyMWJhZTA3NjI1NiIsIm5iZiI6MTcyMjg3MzQ1Mi4yNTQzNjMsInN1YiI6IjY2YjBmNGJmNTUwNDZjZjIzOWViNzc4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0omKPI04MmliYldMTJUoYWreUqHUj9DlinE5-HDU6TE';
-  const config = { 
-    headers: {
-      Authorization: `Bearer ${yourBearerToken}`
-    } 
-  };
+  
 
   try {
-    const response = await axios.get(`https://api.themoviedb.org/3/search/movie?query=${query}`, config);
+    const response = await axios.get(`${BASE_URL}/search/movie?query=${query}`, config);
     return response.data; // Return data for further use
   } catch (error) {
     console.error('Fetch error:', error);
@@ -99,7 +109,7 @@ async function searchData(query) {
   }
 }
 
-async function renderMovies(page) {
+async function renderMovies() {
   const data = await movieData(page);
   const movies = data.results || []; // Ensure results is an array
 
@@ -111,8 +121,8 @@ async function renderMovies(page) {
   });
 }
 
-async function renderSearchMovies(inputQuery) {
-  const data = await searchData(inputQuery);
+async function renderSearchMovies(query) {
+  const data = await searchData(query);
   const movies = data.results || []; // Ensure results is an array
 
   $('#movie-container').empty(); // Clear existing content
