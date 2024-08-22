@@ -32,7 +32,7 @@ function prevPage() {
         const inputQuery = $('#search-input').val().trim();
         console.log(inputQuery);
         if(inputQuery) {
-          renderSearchMovies(inputQuery)
+          updateSearchURLAndFetch(inputQuery)
         }
         
       }
@@ -79,11 +79,11 @@ function updateURLAndFetch(page) {
 
 function updateSearchURLAndFetch(query) {
   // Update the browser's URL without reloading the page
-  const newUrl = `/movies?query=${query}`; 
+  const newUrl = `/search?query=${query}`; 
   window.history.pushState({ query }, `Query ${query}`, newUrl);
 
   // Fetch the search results
-  renderSearchMovies(inputQuery);
+  renderSearchMovies(query);
 }
 
 async function movieData(page) {
@@ -109,28 +109,18 @@ async function searchData(query) {
   }
 }
 
-async function renderMovies() {
+async function renderMovies(page) {
   const data = await movieData(page);
   const movies = data.results || []; // Ensure results is an array
 
-  $('#movie-container').empty(); // Clear existing content
-
-  movies.forEach(movie => {
-    const content = movieContent(movie);
-    $('#movie-container').append(content);
-  });
+  displayMovies(movies)
 }
 
 async function renderSearchMovies(query) {
   const data = await searchData(query);
   const movies = data.results || []; // Ensure results is an array
 
-  $('#movie-container').empty(); // Clear existing content
-
-  movies.forEach(movie => {
-    const content = movieContent(movie);
-    $('#movie-container').append(content);
-  });
+ displayMovies(movies)
 }
 
 function searchFunction() {

@@ -20,7 +20,13 @@ app.set("view engine", "ejs");
 
 
 // API route to fetch movies based on page number
-app.get(`/`, async (req, res) => {
+// Root route redirects to movies with page 1
+app.get(`/`, (req, res) => {
+  res.redirect('/movies?page=1');
+});
+
+// API route to fetch movies based on page number
+app.get(`/movies`, async (req, res) => {
   const page = req.query.page || 1;
   
   try {
@@ -32,6 +38,24 @@ app.get(`/`, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+app.get("/search", async (req, res) => {
+  const query = req.query.query || '';
+  console.log(query)
+  
+  try {
+    const response = await axios.get(`https://api.themoviedb.org/3/search/movie?query=${query}`, config);
+    const result = response.data;
+    res.render('search.ejs', {content : result});
+  } catch (error) {
+    console.error('Fetch error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
